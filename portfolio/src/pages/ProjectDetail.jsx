@@ -50,16 +50,14 @@ export default function ProjectDetail({ id }) {
             )}
           </DetailSection>
 
-          {/* 3. 트러블슈팅 (STAR) */}
+          {/* 3. 트러블슈팅 */}
           <DetailSection title="트러블슈팅">
             {project.troubleshooting.length > 0 ? (
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {project.troubleshooting.map((t, i) => (
                   <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-                    <StarRow label="S" text={t.situation} color={project.color} />
-                    <StarRow label="T" text={t.task} color={project.color} />
-                    <StarRow label="A" text={t.action} color={project.color} />
-                    <StarRow label="R" text={t.result} color={project.color} last />
+                    <p className="text-[15px] font-semibold text-white mb-2">{t.title}</p>
+                    <p className="text-sm text-gray-400 leading-relaxed">{t.body}</p>
                   </div>
                 ))}
               </div>
@@ -70,7 +68,7 @@ export default function ProjectDetail({ id }) {
 
           {/* 4. 기술 스택 */}
           <DetailSection title="기술 스택">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mb-5">
               {project.tech.map((t) => (
                 <span
                   key={t}
@@ -81,6 +79,18 @@ export default function ProjectDetail({ id }) {
                 </span>
               ))}
             </div>
+            {project.stack?.length > 0 ? (
+              <dl className="space-y-3">
+                {project.stack.map((s) => (
+                  <div key={s.name} className="flex gap-3 text-sm">
+                    <dt className="flex-shrink-0 w-28 font-medium text-gray-300">{s.name}</dt>
+                    <dd className="text-gray-500 leading-relaxed">{s.why}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <Placeholder />
+            )}
           </DetailSection>
 
           {/* 5. 데모 (부가 버튼 — demoUrl 없으면 아예 표시 안 함) */}
@@ -123,20 +133,6 @@ function Placeholder() {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-gray-600">
       준비 중
-    </div>
-  )
-}
-
-function StarRow({ label, text, color, last }) {
-  return (
-    <div className={`flex gap-3 ${last ? '' : 'mb-4'}`}>
-      <span
-        className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold"
-        style={{ color, background: color + '22' }}
-      >
-        {label}
-      </span>
-      <p className="text-sm text-gray-300 leading-relaxed pt-0.5">{text}</p>
     </div>
   )
 }
