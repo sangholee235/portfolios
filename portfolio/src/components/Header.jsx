@@ -4,7 +4,8 @@ import { Link } from '../router'
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 backdrop-blur-md bg-[#070709]/80 border-b border-white/5">
-      <div className="max-w-6xl mx-auto px-6 md:px-10 h-16 flex items-center">
+      {/* Hero의 px-8 md:px-20 과 동일한 좌측 패딩 — max-w로 가운데 정렬하면 본문과 어긋남 */}
+      <div className="px-8 md:px-20 h-16 flex items-center">
         <Link
           to="/"
           aria-label="홈으로"

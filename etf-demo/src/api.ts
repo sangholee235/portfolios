@@ -9,20 +9,11 @@ import type {
 } from './types'
 
 const delay = (ms = 300) => new Promise((r) => setTimeout(r, ms))
+const today = () => new Date().toISOString().slice(0, 10)
+const now = () => new Date().toISOString()
+const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString()
 
-// ---------------- 더미 시세(원) ----------------
-const PRICE: Record<string, number> = {
-  '069500': 41_820,  // KODEX 200
-  '379810': 25_960,  // KODEX 미국나스닥100
-  '360750': 18_640,  // TIGER 미국S&P500
-  '133690': 108_450, // TIGER 미국나스닥100
-  '229200': 8_215,   // KODEX 코스닥150
-  '381180': 15_930,  // TIGER 미국필라델피아반도체나스닥
-  '449180': 12_380,  // TIGER 미국배당다우존스
-  '490090': 11_050,  // TIGER 미국AI빅테크10
-  '102110': 41_760,  // TIGER 200
-  '379800': 18_720,  // KODEX 미국S&P500
-}
+// ---------------- 종목명 (두 브로커 공통) ----------------
 const NAME: Record<string, string> = {
   '069500': 'KODEX 200', '379810': 'KODEX 미국나스닥100', '360750': 'TIGER 미국S&P500',
   '133690': 'TIGER 미국나스닥100', '229200': 'KODEX 코스닥150',
@@ -30,61 +21,101 @@ const NAME: Record<string, string> = {
   '490090': 'TIGER 미국AI빅테크10', '102110': 'TIGER 200', '379800': 'KODEX 미국S&P500',
 }
 
-// ---------------- 메모리 상태 (버튼 눌러보면 반응하도록) ----------------
-let config: BotConfig = {
-  symbol: '069500', symbol_name: 'KODEX 200',
-  portfolio_mode: true,
-  portfolio: [
-    { symbol: '069500', name: 'KODEX 200', weight: 60 },
-    { symbol: '379810', name: 'KODEX 미국나스닥100', weight: 40 },
-  ],
-  fill_mode: 'weight',
-  wait_for_underweight: false,
-  quantity_per_buy: 1, buy_amount_krw: 0, discount_pct: 0.005,
-  fallback_after_misses: 5, tick_size: 5,
-  daily_budget_krw: 50_000, total_budget_krw: 0, require_market_open: true,
-  schedule_enabled: true, schedule_time: '09:05',
-  dry_run: true,   // 데모는 항상 모의 — 실주문 아님을 UI에서도 드러냄
-  enabled: true,
+// ---------------- 실시간 느낌 — 시세가 계속 조금씩 흔들린다 ----------------
+// 실제 제품은 키움 WebSocket 체결가(0B)를 SSE로 흘려보내 화면을 실시간 갱신하는데,
+// 이 데모엔 진짜 시세 소스가 없어서 대신 짧은 주기로 무작위 소폭 변동을 준다.
+// AutoPage.tsx 의 AnimatedNumber 가 값이 바뀔 때마다 굴러가는 애니메이션을 그려준다.
+const BASE_PRICE: Record<string, number> = {
+  '069500': 41_820, '379810': 25_960, '360750': 18_640, '133690': 108_450,
+  '229200': 8_215, '381180': 15_930, '449180': 12_380, '490090': 11_050,
+  '102110': 41_760, '379800': 18_720,
+}
+const PRICE: Record<string, number> = { ...BASE_PRICE }
+
+setInterval(() => {
+  for (const sym of Object.keys(PRICE)) {
+    const base = BASE_PRICE[sym]
+    const drift = (Math.random() - 0.5) * 0.006   // ±0.3%
+    PRICE[sym] = Math.max(1, Math.round((PRICE[sym] * (1 + drift) + base * 0.02 * (Math.random() - 0.5)) / 5) * 5)
+  }
+}, 2500)
+
+// ---------------- 브로커별 메모리 상태 (버튼 눌러보면 반응하도록) ----------------
+interface BrokerStore {
+  config: BotConfig
+  invested: Record<string, number>  // 매입금액
+  qty: Record<string, number>
+  logs: BotLog[]
+  accountNo: string
 }
 
-let invested: Record<string, number> = { '069500': 612_000, '379810': 358_000 } // 매입금액
-let qty: Record<string, number> = { '069500': 14, '379810': 13 }
-
-const now = () => new Date().toISOString()
-const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString()
-
-let logs: BotLog[] = [
-  { ts: minutesAgo(130), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 379810 1주 (목표비중 맞춤, 25,960원 기준)', symbol: '379810', quantity: 1, price: 25960, filled: true, order_id: 'DEMO-0001' },
-  { ts: minutesAgo(70), trade_date: today(), mode: 'DRY_RUN', action: 'SKIP', reason: '오늘 살 게 없음 — 이미 목표 비중 도달', symbol: null as unknown as string, quantity: 0, price: null, filled: null },
-  { ts: minutesAgo(10), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 069500 1주 (목표비중 맞춤, 41,820원 기준)', symbol: '069500', quantity: 1, price: 41820, filled: true, order_id: 'DEMO-0002' },
-]
-
-function today() {
-  return new Date().toISOString().slice(0, 10)
+function makeConfig(portfolio: { symbol: string; name: string; weight: number }[]): BotConfig {
+  return {
+    symbol: portfolio[0].symbol, symbol_name: portfolio[0].name,
+    portfolio_mode: true, portfolio,
+    fill_mode: 'weight', wait_for_underweight: false,
+    quantity_per_buy: 1, buy_amount_krw: 0, discount_pct: 0.005,
+    fallback_after_misses: 5, tick_size: 5,
+    daily_budget_krw: 50_000, total_budget_krw: 0, require_market_open: true,
+    schedule_enabled: true, schedule_time: '09:05',
+    dry_run: true,   // 데모는 항상 모의 — 실주문 아님을 UI에서도 드러냄
+    enabled: true,
+  }
 }
 
-function totalInvested() {
-  return Object.values(invested).reduce((s, v) => s + v, 0)
+const stores: Record<string, BrokerStore> = {
+  kiwoom: {
+    config: makeConfig([
+      { symbol: '069500', name: 'KODEX 200', weight: 60 },
+      { symbol: '379810', name: 'KODEX 미국나스닥100', weight: 40 },
+    ]),
+    invested: { '069500': 612_000, '379810': 358_000 },
+    qty: { '069500': 14, '379810': 13 },
+    accountNo: '1234-5678-90(모의)',
+    logs: [
+      { ts: minutesAgo(130), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 379810 1주 (목표비중 맞춤, 25,960원 기준)', symbol: '379810', quantity: 1, price: 25960, filled: true, order_id: 'DEMO-K-0001' },
+      { ts: minutesAgo(70), trade_date: today(), mode: 'DRY_RUN', action: 'SKIP', reason: '오늘 살 게 없음 — 이미 목표 비중 도달', symbol: null as unknown as string, quantity: 0, price: null, filled: null },
+      { ts: minutesAgo(10), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 069500 1주 (목표비중 맞춤, 41,820원 기준)', symbol: '069500', quantity: 1, price: 41820, filled: true, order_id: 'DEMO-K-0002' },
+    ],
+  },
+  toss: {
+    config: makeConfig([
+      { symbol: '360750', name: 'TIGER 미국S&P500', weight: 70 },
+      { symbol: '229200', name: 'KODEX 코스닥150', weight: 30 },
+    ]),
+    invested: { '360750': 469_000, '229200': 172_000 },
+    qty: { '360750': 25, '229200': 21 },
+    accountNo: '13501-006210(모의)',
+    logs: [
+      { ts: minutesAgo(95), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 360750 1주 (목표비중 맞춤, 18,640원 기준)', symbol: '360750', quantity: 1, price: 18640, filled: true, order_id: 'DEMO-T-0001' },
+      { ts: minutesAgo(20), trade_date: today(), mode: 'DRY_RUN', action: 'MARKET_BUY', reason: '그리디 리밸런싱: 229200 1주 (목표비중 맞춤, 8,215원 기준)', symbol: '229200', quantity: 1, price: 8215, filled: true, order_id: 'DEMO-T-0002' },
+    ],
+  },
 }
 
-function progress(): PortfolioProgress[] {
-  const items = config.portfolio.filter((p) => p.weight > 0)
-  const totalW = items.reduce((s, p) => s + Number(p.weight), 0) || 1
-  const totalInv = totalInvested() || 1
+const store = (broker?: string) => stores[broker ?? 'kiwoom'] ?? stores.kiwoom
+
+function totalInvested(s: BrokerStore) {
+  return Object.values(s.invested).reduce((sum, v) => sum + v, 0)
+}
+
+function progress(s: BrokerStore): PortfolioProgress[] {
+  const items = s.config.portfolio.filter((p) => p.weight > 0)
+  const totalW = items.reduce((sum, p) => sum + Number(p.weight), 0) || 1
+  const totalInv = totalInvested(s) || 1
   return items.map((p) => ({
     symbol: p.symbol, name: p.name,
     targetWeight: Number(p.weight) / totalW,
-    currentWeight: (invested[p.symbol] ?? 0) / totalInv,
-    investedKrw: invested[p.symbol] ?? 0,
+    currentWeight: (s.invested[p.symbol] ?? 0) / totalInv,
+    investedKrw: s.invested[p.symbol] ?? 0,
   }))
 }
 
-function holdingsSnapshot(): Holdings {
-  const items = config.portfolio.map((p) => {
-    const q = qty[p.symbol] ?? 0
+function holdingsSnapshot(s: BrokerStore): Holdings {
+  const items = s.config.portfolio.map((p) => {
+    const q = s.qty[p.symbol] ?? 0
     const last = PRICE[p.symbol] ?? 0
-    const purchase = invested[p.symbol] ?? 0
+    const purchase = s.invested[p.symbol] ?? 0
     const amount = q * last
     const pl = amount - purchase
     return {
@@ -95,8 +126,8 @@ function holdingsSnapshot(): Holdings {
       profitLoss: { amount: String(pl), rate: String(purchase ? pl / purchase : 0), amountAfterCost: String(pl), rateAfterCost: String(purchase ? pl / purchase : 0) },
     }
   })
-  const totalAmount = items.reduce((s, it) => s + Number(it.marketValue.amount), 0)
-  const totalPurchase = items.reduce((s, it) => s + Number(it.marketValue.purchaseAmount), 0)
+  const totalAmount = items.reduce((sum, it) => sum + Number(it.marketValue.amount), 0)
+  const totalPurchase = items.reduce((sum, it) => sum + Number(it.marketValue.purchaseAmount), 0)
   const totalPl = totalAmount - totalPurchase
   return {
     marketValue: { amount: { krw: String(totalAmount), usd: null } },
@@ -114,16 +145,16 @@ function isMarketOpenNow(): boolean {
 }
 
 export const api = {
-  brokers: async () => { await delay(150); return { brokers: ['kiwoom'], default: 'kiwoom' } },
+  brokers: async () => { await delay(150); return { brokers: ['kiwoom', 'toss'], default: 'kiwoom' } },
 
-  accounts: async (_broker?: string): Promise<Account[]> => {
+  accounts: async (broker?: string): Promise<Account[]> => {
     await delay()
-    return [{ accountNo: '1234-5678-90(모의)', accountSeq: 1, accountType: 'BROKERAGE' }]
+    return [{ accountNo: store(broker).accountNo, accountSeq: 1, accountType: 'BROKERAGE' }]
   },
 
   exchangeRate: async () => { await delay(100); return { rate: '1350' } },
 
-  holdings: async (_broker?: string): Promise<Holdings> => { await delay(); return holdingsSnapshot() },
+  holdings: async (broker?: string): Promise<Holdings> => { await delay(); return holdingsSnapshot(store(broker)) },
 
   buyingPower: async (_currency?: string, _broker?: string): Promise<BuyingPower> => {
     await delay(); return { currency: 'KRW', cashBuyingPower: '87340' }
@@ -131,9 +162,10 @@ export const api = {
 
   openOrders: async (_broker?: string): Promise<OrdersPage> => { await delay(200); return { orders: [], nextCursor: null, hasNext: false } },
 
-  closedOrders: async (_broker?: string): Promise<OrdersPage> => {
+  closedOrders: async (broker?: string): Promise<OrdersPage> => {
     await delay(300)
-    const orders: Order[] = logs.filter((l) => l.action === 'MARKET_BUY').map((l, i) => ({
+    const s = store(broker)
+    const orders: Order[] = s.logs.filter((l) => l.action === 'MARKET_BUY').map((l, i) => ({
       orderId: l.order_id ?? `DEMO-${i}`,
       symbol: l.symbol, side: 'BUY', orderType: 'MARKET', status: 'FILLED',
       price: null, quantity: String(l.quantity), currency: 'KRW', orderedAt: l.ts,
@@ -149,27 +181,29 @@ export const api = {
     return { alive: true, threadAlive: true, lastTick: minutesAgo(0), secondsSinceTick: 12 }
   },
 
-  botRealtime: async () => { await delay(100); return { connected: true, lastError: null, broker: 'kiwoom' } },
+  botRealtime: async (broker?: string) => { await delay(100); return { connected: true, lastError: null, broker: broker ?? 'kiwoom' } },
 
   marketStatus: async (_broker?: string) => { await delay(100); return { open: isMarketOpenNow() } },
 
-  botStatus: async (_broker?: string): Promise<BotStatus> => {
+  botStatus: async (broker?: string): Promise<BotStatus> => {
     await delay()
+    const s = store(broker)
     return {
-      config,
-      state: { totalInvestedKrw: totalInvested(), totalFilledQty: Object.values(qty).reduce((s, v) => s + v, 0), consecutiveMisses: 0, lastTradeDate: today(), logs },
+      config: s.config,
+      state: { totalInvestedKrw: totalInvested(s), totalFilledQty: Object.values(s.qty).reduce((sum, v) => sum + v, 0), consecutiveMisses: 0, lastTradeDate: today(), logs: s.logs },
     }
   },
 
-  botPreview: async (_broker?: string): Promise<BotPreview> => {
+  botPreview: async (broker?: string): Promise<BotPreview> => {
     await delay()
-    const prog = progress()
+    const s = store(broker)
+    const prog = progress(s)
     const under = prog.slice().sort((a, b) => (b.targetWeight - b.currentWeight) - (a.targetWeight - a.currentWeight))[0]
-    const sym = under?.symbol ?? config.portfolio[0]?.symbol
+    const sym = under?.symbol ?? s.config.portfolio[0]?.symbol
     const price = PRICE[sym] ?? 0
     return {
-      dryRun: config.dry_run, enabled: config.enabled, dailyBudgetKrw: config.daily_budget_krw,
-      progress: prog, fillMode: config.fill_mode, waterfall: [],
+      dryRun: s.config.dry_run, enabled: s.config.enabled, dailyBudgetKrw: s.config.daily_budget_krw,
+      progress: prog, fillMode: s.config.fill_mode, waterfall: [],
       hasTarget: true, symbol: sym, name: NAME[sym] ?? sym,
       action: 'MARKET_BUY', quantity: 1, price: null, lastPrice: price, estCost: price,
       decisionReason: '1개 종목 매수 예정 (목표비중 그리디 리밸런싱, 시장가)',
@@ -197,28 +231,30 @@ export const api = {
       .map(([symbol, name]) => ({ symbol, name, market: 'KOSPI', lastPrice: String(PRICE[symbol]) }))
   },
 
-  botRun: async (_broker?: string) => {
+  botRun: async (broker?: string) => {
     await delay(500)
-    const prog = progress()
+    const s = store(broker)
+    const prog = progress(s)
     const under = prog.slice().sort((a, b) => (b.targetWeight - b.currentWeight) - (a.targetWeight - a.currentWeight))[0]
-    const sym = under?.symbol ?? config.portfolio[0]?.symbol
+    const sym = under?.symbol ?? s.config.portfolio[0]?.symbol
     const price = PRICE[sym] ?? 0
-    invested[sym] = (invested[sym] ?? 0) + price
-    qty[sym] = (qty[sym] ?? 0) + 1
+    s.invested[sym] = (s.invested[sym] ?? 0) + price
+    s.qty[sym] = (s.qty[sym] ?? 0) + 1
     const log: BotLog = {
-      ts: now(), trade_date: today(), mode: config.dry_run ? 'DRY_RUN' : 'LIVE', action: 'MARKET_BUY',
+      ts: now(), trade_date: today(), mode: s.config.dry_run ? 'DRY_RUN' : 'LIVE', action: 'MARKET_BUY',
       reason: `그리디 리밸런싱: ${sym} 1주 (목표비중 맞춤, ${price.toLocaleString()}원 기준)`,
-      symbol: sym, quantity: 1, price, filled: true, order_id: `DEMO-${logs.length + 1}`,
+      symbol: sym, quantity: 1, price, filled: true, order_id: `DEMO-${s.logs.length + 1}`,
     }
-    logs = [...logs, log]
-    return { mode: log.mode, enabled: config.enabled, symbol: sym, decision: { action: 'MARKET_BUY', price, reason: log.reason }, filled: true }
+    s.logs = [...s.logs, log]
+    return { mode: log.mode, enabled: s.config.enabled, symbol: sym, decision: { action: 'MARKET_BUY', price, reason: log.reason }, filled: true }
   },
 
-  botPatchConfig: async (patch: Partial<BotConfig>, _broker?: string): Promise<BotConfig> => {
+  botPatchConfig: async (patch: Partial<BotConfig>, broker?: string): Promise<BotConfig> => {
     await delay()
-    config = { ...config, ...patch }
-    return config
+    const s = store(broker)
+    s.config = { ...s.config, ...patch }
+    return s.config
   },
 
-  botLogs: async (limit = 200, _broker?: string): Promise<BotLog[]> => { await delay(); return logs.slice(-limit) },
+  botLogs: async (limit = 200, broker?: string): Promise<BotLog[]> => { await delay(); return store(broker).logs.slice(-limit) },
 }

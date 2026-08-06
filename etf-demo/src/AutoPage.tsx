@@ -107,7 +107,15 @@ function BrokerView({ broker }: { broker: string }) {
     }, 15000)
     api.botRealtime().then(setRt).catch(() => {})
     api.marketStatus(broker).then((r) => setMarketOpen(r.open)).catch(() => {})
-    return () => clearInterval(t)
+    // 데모용: 실제론 키움 WebSocket 체결가(0B)가 SSE로 들어올 때마다 화면이 갱신되는데,
+    // 이 데모엔 그 소스가 없어서 대신 짧은 주기로 보유현황·미리보기를 다시 읽어온다.
+    // api.ts 쪽에서 시세가 계속 조금씩 흔들리므로, AnimatedNumber가 그 변화를 롤링
+    // 애니메이션으로 보여준다(실시간 체결통보 느낌을 흉내).
+    const tick = setInterval(() => {
+      api.holdings(broker).then(setHoldings).catch(() => {})
+      api.botPreview(broker).then(setPreview).catch(() => {})
+    }, 2500)
+    return () => { clearInterval(t); clearInterval(tick) }
   }, [load, broker])
 
   // 데모용: 실제론 SSE(/api/bot/stream)로 실시간 체결통보를 받는데,
