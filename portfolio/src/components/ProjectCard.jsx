@@ -1,6 +1,6 @@
-export default function ProjectCard({ project, index }) {
-  const isEven = index % 2 === 0
+import { Link } from '../router'
 
+export default function ProjectCard({ project, index }) {
   return (
     <div
       className={`reveal delay-${index + 1} group relative rounded-2xl border bg-[#0d0d0f] overflow-hidden transition-all duration-300 ${project.borderColor} ${project.glowClass}`}
@@ -74,16 +74,14 @@ export default function ProjectCard({ project, index }) {
           </div>
         </div>
 
-        {/* CTA 버튼 */}
-        <a
-          href={project.url}
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* CTA — 라이브 데모로 바로 안 가고, 상세페이지(트러블슈팅·기여)로 이동 */}
+        <Link
+          to={`/projects/${project.id}`}
           className={`group/btn flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r ${project.gradient} text-white`}
         >
-          프로젝트 보러가기
+          자세히 보기
           <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
-        </a>
+        </Link>
       </div>
     </div>
   )

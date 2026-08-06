@@ -1,4 +1,10 @@
 // 빌드 배포 기준 경로 (npm run build:all 후 portfolio/dist/ 배포 시 그대로 동작)
+//
+// 스키마:
+//   role            내 역할/기여 한 줄 (없으면 상세페이지에서 안내문 표시)
+//   troubleshooting [{ situation, task, action, result }, ...] STAR 형식 (없으면 안내문 표시)
+//   demoUrl         string | null — null이면 상세페이지에 데모 버튼 자체를 숨김
+//   repoUrl         GitHub 링크
 export const projects = [
   {
     id: 'gomin',
@@ -15,6 +21,10 @@ export const projects = [
       'Kakao / Google 소셜 로그인',
       'BGM & 사운드 이펙트',
     ],
+    role: null,
+    troubleshooting: [],
+    demoUrl: '/gomin/',
+    repoUrl: null,
     color: '#FF6A3B',
     colorLight: '#FF6A3B22',
     gradient: 'from-orange-500 to-red-500',
@@ -22,7 +32,6 @@ export const projects = [
     glowClass: 'card-glow-orange',
     borderColor: 'border-orange-500/30',
     icon: '🍣',
-    url: '/gomin/',
   },
   {
     id: 'techmate',
@@ -39,6 +48,10 @@ export const projects = [
       'Google / Kakao OAuth',
       '스켈레톤 UI & 부드러운 UX',
     ],
+    role: null,
+    troubleshooting: [],
+    demoUrl: '/techmate/',
+    repoUrl: null,
     color: '#1A75FF',
     colorLight: '#1A75FF22',
     gradient: 'from-blue-500 to-indigo-600',
@@ -46,7 +59,6 @@ export const projects = [
     glowClass: 'card-glow-blue',
     borderColor: 'border-blue-500/30',
     icon: '💡',
-    url: '/techmate/',
   },
   {
     id: 'cholog',
@@ -63,6 +75,10 @@ export const projects = [
       'Jira 이슈 자동 생성',
       'Mattermost 웹훅 알림',
     ],
+    role: null,
+    troubleshooting: [],
+    demoUrl: '/cholog/',
+    repoUrl: null,
     color: '#5EA500',
     colorLight: '#5EA50022',
     gradient: 'from-lime-500 to-green-600',
@@ -70,6 +86,36 @@ export const projects = [
     glowClass: 'card-glow-green',
     borderColor: 'border-lime-500/30',
     icon: '🪵',
-    url: '/cholog/',
+  },
+  {
+    id: 'etf-bot',
+    name: 'ETF 자동 적립 봇',
+    nameEn: 'ETF Auto-Invest Bot',
+    tagline: '목표 비중대로 그리디하게 사 모으는 매수전용 봇',
+    description:
+      '토스증권·키움증권 Open API 기반, 여러 ETF를 목표 비중대로 그리디 리밸런싱하며 적립하는 매수전용 봇. ' +
+      '매도 로직 없이 다층 안전장치를 두고 AWS Lightsail에 상시 배포해 실거래로 운영 중.',
+    tech: ['Python', 'FastAPI', 'React', 'TypeScript', 'Docker', 'GitHub Actions', 'AWS Lightsail'],
+    features: [
+      '목표비중 그리디 리밸런싱 적립',
+      '토스·키움 브로커 추상화',
+      '실시간 체결통보 (WebSocket → SSE)',
+      'Pull 기반 무인 CI/CD (서버 진입점 0개)',
+      'DRY_RUN · 하루한도 · 킬스위치 등 다층 안전장치',
+    ],
+    role: '기획·설계·백엔드/프론트엔드 구현·배포 전체를 단독으로 담당.',
+    troubleshooting: [
+      // TODO: STAR 형식 사례 추가 예정 (SKIP 로그 오표시, RuntimeError 미처리, CI skip으로 배포 안 됨 등)
+    ],
+    // TODO: 실계좌 노출 없는 더미데이터 데모 빌드 준비 중 — 완성 전까지 null
+    demoUrl: null,
+    repoUrl: null,
+    color: '#F5A623',
+    colorLight: '#F5A62322',
+    gradient: 'from-amber-500 to-yellow-600',
+    gradientBg: 'from-amber-950/30 to-yellow-950/20',
+    glowClass: 'card-glow-amber',
+    borderColor: 'border-amber-500/30',
+    icon: '📈',
   },
 ]

@@ -59,6 +59,9 @@ body {
 .card-glow-orange:hover {
   box-shadow: 0 0 40px #FF6A3B20, 0 0 80px #FF6A3B10;
 }
+.card-glow-amber:hover {
+  box-shadow: 0 0 40px #F5A62320, 0 0 80px #F5A62310;
+}
 
 /* 그라디언트 텍스트 */
 .gradient-text {
