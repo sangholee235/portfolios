@@ -1,4 +1,5 @@
 import { RouterProvider, useRouter, segments } from './router'
+import Header from './components/Header'
 import Hero from './components/Hero'
 import Resume from './pages/Resume'
 import Projects from './pages/Projects'
@@ -24,6 +25,7 @@ export default function App() {
   return (
     <RouterProvider>
       <div className="bg-[#070709] min-h-screen text-white">
+        <Header />
         <Screen />
       </div>
     </RouterProvider>

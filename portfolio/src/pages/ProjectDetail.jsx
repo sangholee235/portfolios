@@ -8,7 +8,7 @@ export default function ProjectDetail({ id }) {
     return (
       <section className="min-h-screen px-6 py-20">
         <div className="max-w-3xl mx-auto">
-          <BackLink to="/projects">← 프로젝트 목록</BackLink>
+          <BackLink />
           <p className="text-gray-500 mt-8">프로젝트를 찾을 수 없습니다.</p>
         </div>
       </section>
@@ -18,7 +18,7 @@ export default function ProjectDetail({ id }) {
   return (
     <section className="min-h-screen px-6 py-20">
       <div className="max-w-3xl mx-auto">
-        <BackLink to="/projects" children="← 프로젝트 목록" />
+        <BackLink />
 
         {/* 헤더 */}
         <div className="flex items-center gap-4 mt-8 mb-2">

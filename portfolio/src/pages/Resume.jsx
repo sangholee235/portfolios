@@ -1,13 +1,9 @@
-import BackLink from '../components/BackLink'
-
 /** 이력서 — 스택/경력/소개. 내용은 추후 전달받아 채움(지금은 골격만). */
 export default function Resume() {
   return (
     <section className="min-h-screen px-6 py-20">
       <div className="max-w-3xl mx-auto">
-        <BackLink />
-
-        <h1 className="text-4xl font-black gradient-text mt-8 mb-2">이력서</h1>
+        <h1 className="text-4xl font-black gradient-text mb-2">이력서</h1>
         <p className="text-gray-500 text-sm mb-16">내용 준비 중입니다.</p>
 
         <div className="space-y-16">
