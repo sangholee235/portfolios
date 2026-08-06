@@ -53,10 +53,10 @@ export default function ProjectDetail({ id }) {
           {/* 3. 트러블슈팅 */}
           <DetailSection title="트러블슈팅">
             {project.troubleshooting.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {project.troubleshooting.map((t, i) => (
-                  <div key={i} className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-                    <p className="text-[15px] font-semibold text-white mb-2">{t.title}</p>
+                  <div key={i}>
+                    <p className="text-[15px] font-semibold text-white mb-1.5">{t.title}</p>
                     <p className="text-sm text-gray-400 leading-relaxed">{t.body}</p>
                   </div>
                 ))}
