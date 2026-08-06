@@ -1,6 +1,12 @@
 import { skillGroups } from '../data/skills'
 
-/** 이력서 — 스택/경력/소개. 소개·경력은 추후 전달받아 채움(지금은 골격만). */
+const timeline = [
+  { period: '2026.02 – 현재', title: 'MES 개발자', org: '재직 중' },
+  { period: '2024.07 – 2025.06', title: '삼성 청년 SW·AI 아카데미(SSAFY) 수료', org: 'Java 전공트랙 · 1,620시간' },
+  { period: '2018.03 – 2024.02', title: '소프트웨어학과 졸업', org: null },
+]
+
+/** 이력서 — 스택/경력/소개. 소개는 추후 전달받아 채움(지금은 골격만). */
 export default function Resume() {
   return (
     <section className="min-h-screen px-6 py-20">
@@ -35,7 +41,17 @@ export default function Resume() {
           </ResumeSection>
 
           <ResumeSection title="경력 / 이력">
-            <Placeholder />
+            <div className="space-y-6">
+              {timeline.map((t) => (
+                <div key={t.title} className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-6">
+                  <p className="text-xs font-mono text-gray-500 sm:w-36 sm:flex-shrink-0">{t.period}</p>
+                  <div>
+                    <p className="text-[15px] font-medium text-white">{t.title}</p>
+                    {t.org && <p className="text-sm text-gray-500 mt-0.5">{t.org}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           </ResumeSection>
         </div>
       </div>
