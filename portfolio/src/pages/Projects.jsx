@@ -27,18 +27,8 @@ export default function Projects() {
   return (
     <section ref={sectionRef} className="min-h-screen px-6 py-20">
       <div className="max-w-6xl mx-auto">
-        <BackLink />
-
-        <div className="text-center mt-8 mb-16">
-          <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">
-            Projects
-          </p>
-          <h1 className="text-4xl md:text-5xl font-black gradient-text mb-6">
-            진행한 프로젝트
-          </h1>
-          <p className="text-gray-500 max-w-lg mx-auto text-base leading-relaxed">
-            카드를 누르면 각 프로젝트의 역할·트러블슈팅을 볼 수 있습니다.
-          </p>
+        <div className="mb-10">
+          <BackLink />
         </div>
 
         {/* 카드 몇 개든 자동으로 줄바꿈되는 반응형 그리드 — 추가돼도 구조 안 깨짐 */}
