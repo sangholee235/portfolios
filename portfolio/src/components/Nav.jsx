@@ -9,7 +9,7 @@ const ITEMS = [
 /** 홈에만 뜨는 nav — 여기서만 다른 화면으로 진입한다. */
 export default function Nav() {
   return (
-    <nav className="flex flex-wrap items-center justify-center gap-3">
+    <nav className="flex flex-wrap items-center justify-start gap-3">
       {ITEMS.map((item) => (
         <Link
           key={item.to}

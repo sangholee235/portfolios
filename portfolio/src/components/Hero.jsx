@@ -22,7 +22,7 @@ export default function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden dot-grid"
+      className="relative min-h-screen flex flex-col items-start justify-center px-8 md:px-20 overflow-hidden dot-grid"
       style={{
         background:
           'radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 40%), #1a1a2e 0%, #070709 60%)',
@@ -31,8 +31,8 @@ export default function Hero() {
       {/* 배경 글로우 블롭 */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full opacity-10 blur-[120px] bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 pointer-events-none" />
 
-      {/* 메인 콘텐츠 — 직함·스택 나열 없이 담백한 인삿말 + nav */}
-      <div className="relative z-10 text-center max-w-2xl w-full">
+      {/* 메인 콘텐츠 — 직함·스택 나열 없이 담백한 인삿말 + nav (좌측 시작) */}
+      <div className="relative z-10 text-left max-w-2xl w-full">
         <h1
           className="text-5xl md:text-6xl font-black leading-tight mb-14 animate-fade-in-up gradient-text"
           style={{ animationFillMode: 'both' }}

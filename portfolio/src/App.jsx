@@ -1,6 +1,5 @@
 import { RouterProvider, useRouter, segments } from './router'
 import Hero from './components/Hero'
-import Footer from './components/Footer'
 import Resume from './pages/Resume'
 import Projects from './pages/Projects'
 import ProjectDetail from './pages/ProjectDetail'
@@ -26,7 +25,6 @@ export default function App() {
     <RouterProvider>
       <div className="bg-[#070709] min-h-screen text-white">
         <Screen />
-        <Footer />
       </div>
     </RouterProvider>
   )
