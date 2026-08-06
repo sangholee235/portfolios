@@ -1,0 +1,471 @@
+:root {
+  --bg: #16161a;          /* 페이지 배경 (다크) */
+  --card: #1e1e24;
+  --card-hover: #24242c;
+  --line: #2c2c34;
+  --line-soft: #232329;
+  --txt: #edeef0;
+  --txt2: #b0b4ba;
+  --muted: #757a85;
+  --up: #ff5b5b;          /* 상승 빨강 */
+  --down: #4d9fff;        /* 하락 파랑 */
+  --accent: #3182f6;      /* 토스 블루 */
+  --accent-weak: rgba(49, 130, 246, 0.16);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: #0c0c0f;           /* 폰 컬럼 바깥 (데스크탑에서 컬럼 강조) */
+  color: var(--txt);
+  font-family: 'Pretendard', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;            /* 가로 스크롤(페이지) 방지 */
+}
+
+.wrap { min-height: 100%; }
+
+/* ---------- 앱 컨테이너 (반응형) ---------- */
+.app {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* 상단바: 데스크탑 네비 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(22, 22, 26, 0.78);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  /* PWA 전체화면에서 노치/상태바 아래로 밀기 */
+  padding: calc(14px + env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+           14px max(24px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.topbar h1 { font-size: 18px; margin: 0; font-weight: 800; letter-spacing: -0.02em; }
+.top-tabs { display: flex; gap: 6px; }
+.spacer { margin-left: auto; }
+
+.conn { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.conn .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.conn .dot.ok { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,0.18); }
+.conn .dot.bad { background: var(--up); box-shadow: 0 0 0 3px rgba(240,68,82,0.18); }
+
+/* 브랜드 워드마크 */
+.brand { display: flex; align-items: center; gap: 9px; }
+.brand-mark { color: var(--accent); display: flex; }
+.brand-name {
+  font-size: 19px; font-weight: 800; letter-spacing: -0.03em; color: var(--txt);
+}
+.brand-name b { color: var(--accent); font-weight: 800; }
+
+/* 조회 검색 툴바 */
+.toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.toolbar input { flex: 1 1 200px; }
+
+/* 하단 탭바: 모바일 전용 (기본 숨김) */
+.bottom-nav { display: none; }
+
+/* ---------- 콘텐츠 레이아웃 ---------- */
+main { padding: 20px; display: grid; gap: 14px; }
+main.single { width: 100%; }
+
+/* 데스크탑: 2컬럼 그리드 */
+@media (min-width: 760px) {
+  main.view-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;          /* 같은 행 카드 높이 맞춤 (시세 ↔ 차트) */
+  }
+  .view-grid .span2 { grid-column: 1 / -1; }
+}
+
+/* ---------- 헤더 ---------- */
+/* (상단바 스타일은 .topbar 에서 관리) */
+
+.muted { color: var(--muted); font-size: 13px; }
+.err { color: var(--up); font-size: 13px; }
+
+/* ---------- 폼 요소 ---------- */
+input {
+  background: #15151a;
+  border: 1px solid var(--line);
+  color: var(--txt);
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.12s;
+}
+input:focus { border-color: var(--accent); }
+input:not([type='checkbox']) { width: min(260px, 60vw); }
+
+button {
+  background: var(--accent);
+  border: 0;
+  color: #fff;
+  padding: 9px 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s, background 0.12s, opacity 0.12s;
+}
+button:hover { filter: brightness(1.08); }
+button:active { transform: translateY(0.5px); }
+button:disabled { opacity: 0.4; cursor: default; }
+
+.tab { background: transparent; color: var(--muted); padding: 8px 14px; border-radius: 10px; }
+.tab.on { background: var(--accent-weak); color: #6aa8ff; }
+
+/* ---------- 레이아웃 ---------- */
+main {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+  min-width: 0;          /* 그리드 칸 안에서 표/차트가 칸을 넘지 않게 */
+  overflow: hidden;      /* 내부 콘텐츠 오버플로우 클립 (표는 .table-scroll 로 스크롤) */
+}
+.card h2 { font-size: 15px; margin: 0 0 16px; font-weight: 700; letter-spacing: -0.01em; }
+.card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.card-head h2 { margin: 0; }
+
+/* 세그먼트 토글 */
+.seg { display: inline-flex; background: var(--line-soft); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { background: transparent; color: var(--muted); padding: 6px 14px; border-radius: 8px; }
+.seg button.on { background: #30303a; color: var(--txt); }
+
+/* 차트 호스트: 너비 100%, 높이는 차트(360px)가 결정 (고정) */
+.chart-host { width: 100%; }
+
+/* 시세 카드: 스크롤 영역이 카드 바닥까지 채워 가로 스크롤바가 맨 아래에 위치 */
+.quotes-card { display: flex; flex-direction: column; }
+.quotes-card .table-scroll { flex: 1 1 auto; }
+
+/* ---------- 테이블 ---------- */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: right; padding: 12px 10px; border-bottom: 1px solid var(--line-soft); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--muted); font-weight: 500; font-size: 12.5px; }
+tbody tr:last-child td { border-bottom: 0; }
+
+tbody tr.clickable { cursor: pointer; transition: background 0.1s; }
+tbody tr.clickable:hover { background: var(--card-hover); }
+tbody tr.selected { background: var(--accent-weak); }
+tbody tr.selected td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
+.big { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.row { display: flex; gap: 24px; flex-wrap: wrap; }
+.stat { min-width: 140px; flex: 1 1 auto; }
+
+.up { color: var(--up); }
+.down { color: var(--down); }
+
+.check { color: var(--accent); font-weight: 700; }
+
+/* 로딩 스켈레톤 */
+.skel {
+  display: inline-block;
+  background: linear-gradient(90deg, #26262c 25%, #303039 50%, #26262c 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 자산 가리기 (프라이버시 모드) */
+body.hide-assets .money {
+  filter: blur(7px);
+  user-select: none;
+  transition: filter 0.15s;
+}
+.hide-toggle {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 12.5px; font-weight: 600; padding: 6px 12px; line-height: 1;
+  background: #2a2a33; color: var(--txt2); border-radius: 8px;
+}
+.hide-toggle:hover { background: #34343e; filter: none; }
+
+/* 자산 요약 히어로 */
+.hero { background: linear-gradient(135deg, #1e1e24 0%, #1b2230 100%); position: relative; }
+.hero-main { margin-bottom: 18px; }
+.hero-amount { font-size: clamp(26px, 8vw, 34px); font-weight: 800; letter-spacing: -0.03em; margin-top: 4px; word-break: keep-all; }
+.hero-amount .won { font-size: 18px; font-weight: 600; color: var(--muted); margin-left: 3px; }
+.hero-pl { margin-top: 6px; font-size: 14px; font-weight: 600; }
+.hero-sub { display: flex; gap: 28px; flex-wrap: wrap; padding-top: 16px; border-top: 1px solid var(--line); }
+.hero-sub .stat { min-width: 120px; }
+.hero-sub .big { font-size: 16px; }
+
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 6px; font-size: 12.5px; color: var(--txt2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 3px; border-radius: 2px; display: inline-block; }
+
+/* 보유 비중 도넛 */
+.donut-wrap { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+.donut { flex: 0 0 auto; }
+.donut-total-label { fill: var(--muted); font-size: 11px; }
+.donut-total { fill: var(--txt); font-size: 16px; font-weight: 800; }
+.donut-legend { list-style: none; margin: 0; padding: 0; flex: 1 1 240px; min-width: 0; }
+.donut-legend li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); }
+.donut-legend li:last-child { border-bottom: 0; }
+.donut-legend i { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
+.donut-legend .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.donut-legend .pc { font-weight: 700; }
+.donut-legend .amt { flex: 0 0 auto; }
+
+/* 포트폴리오 편집기 */
+.pf-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); }
+.pf-row i { width: 10px; height: 10px; border-radius: 3px; flex: 0 0 auto; }
+.pf-row .nm { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-add { display: flex; gap: 8px; margin-top: 12px; }
+.pf-search-results {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 5;
+  max-height: 260px; overflow-y: auto;
+  background: var(--card, #15151a); border: 1px solid var(--line); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+.pf-search-row {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 9px 12px; cursor: pointer; font-size: 14px;
+}
+.pf-search-row:hover { background: rgba(255,255,255,.06); }
+button.ghost { background: transparent; color: var(--muted); padding: 4px 8px; }
+button.ghost:hover { color: var(--up); filter: none; }
+select { background: #15151a; border: 1px solid var(--line); color: var(--txt); padding: 9px 12px; border-radius: 10px; font-size: 14px; }
+.warn { color: var(--accent) !important; }
+
+/* ───── 적립 페이지: 단계 흐름 ───── */
+.step-head { display: flex; align-items: center; gap: 12px; margin: 10px 2px 0; }
+.step-title { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; }
+
+.log-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+.log-tabs button { background: none; color: var(--txt2); border: none; border-bottom: 2px solid transparent;
+  padding: 6px 14px; font-size: 13px; font-weight: 600; border-radius: 0; margin-bottom: -1px; cursor: pointer; }
+.log-tabs button:hover { color: var(--txt); }
+.log-tabs button.on { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-badge { display: inline-block; background: var(--accent); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 8px; padding: 1px 5px; margin-left: 4px; }
+.step-sub { font-size: 12.5px; }
+
+.broker-bar { display: flex; gap: 8px; padding: 12px 16px; }
+.broker-btn { background: #2a2a33; color: var(--txt2); font-weight: 700; }
+.broker-btn.on { background: var(--accent); color: #fff; }
+
+/* 전략 상태 카드 */
+.strat-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.strat-led { display: flex; align-items: center; gap: 12px; }
+.strat-led .led-dot { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
+.strat-led.on .led-dot { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,0.18); }
+.strat-led.off .led-dot { background: var(--muted); }
+.led-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.market-badge { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.market-badge.open { background: rgba(34,197,94,0.16); color: #4ade80; }
+.market-badge.closed { background: #2a2a33; color: var(--muted); }
+.strat-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+/* 적립 시각: 버튼과 분리된 독립 줄 (삐져나감 방지) */
+.sched-row { margin-top: 14px; width: max-content; max-width: 100%; }
+/* 적립 시각: 버튼 사이에 묻히지 않게 독립 필드로 강조 */
+.sched-field {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; background: #15151a;
+  border: 1px solid var(--line); border-radius: 12px; white-space: nowrap;
+}
+.sched-field .muted { font-size: 13px; }
+.sched-field input[type='time'] {
+  width: auto; font-size: 16px; font-weight: 800; letter-spacing: -0.01em;
+  padding: 7px 10px; color: var(--txt);
+}
+.sched-time { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.strat-stats { display: flex; gap: 28px; flex-wrap: wrap; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--line); }
+.strat-stats .big { font-size: 16px; }
+.sched-hb { font-size: 12px; margin-top: 3px; }
+
+/* 우선순위 워터폴 */
+.wf-list { display: flex; flex-direction: column; gap: 8px; }
+.wf-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: #15151a; border: 1px solid var(--line); border-radius: 12px; }
+.wf-row.dragging { opacity: 0.5; border-color: var(--accent); }
+.wf-grip { cursor: grab; color: var(--muted); font-size: 16px; user-select: none; }
+.wf-pri { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 6px; background: #2a2a33;
+  color: var(--txt2); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.wf-main { flex: 1 1 auto; min-width: 0; }
+.wf-name { font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.wf-bar { height: 6px; border-radius: 3px; background: var(--line); margin: 6px 0 2px; overflow: hidden; }
+.wf-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
+.wf-amt { font-size: 11.5px; }
+.wf-target { display: flex; flex-direction: column; gap: 3px; font-size: 11px; flex: 0 0 auto; }
+.wf-badge { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; }
+.wf-badge.done { background: rgba(34,197,94,0.18); color: #4ade80; }
+.wf-badge.active { background: var(--accent-weak); color: #6aa8ff; }
+.wf-badge.wait { background: #2a2a33; color: var(--muted); }
+
+.wait-toggle { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-wrap: wrap; margin-top: 12px; padding: 12px 14px; background: #15151a;
+  border: 1px solid var(--line); border-radius: 12px; }
+
+.gap-badge { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-left: 6px; white-space: nowrap; }
+.gap-badge.under { background: rgba(77,159,255,0.16); color: #6aa8ff; }   /* 부족 → 살 차례 */
+.gap-badge.over { background: rgba(255,91,91,0.14); color: #ff8a8a; }     /* 초과 → 충분 */
+.gap-badge.bal { background: rgba(34,197,94,0.16); color: #4ade80; }      /* 균형 */
+.gap-badge.next { background: var(--accent-weak); color: #6aa8ff; }
+
+/* 포트폴리오 수렴 진행률 바 */
+.pf-row-wrap { border-bottom: 1px solid var(--line-soft); }
+.pf-row-wrap .pf-row { border-bottom: none; padding-bottom: 2px; }
+.pf-prog { padding: 0 0 9px 20px; }
+.pf-bar { position: relative; height: 6px; border-radius: 3px; background: var(--line); overflow: visible; }
+.pf-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.pf-bar-target { position: absolute; top: -2px; width: 2px; height: 10px; background: var(--txt); border-radius: 1px; }
+.pf-prog-txt { font-size: 11.5px; display: inline-block; margin-top: 4px; }
+
+/* 도움말 아이콘 */
+.help { color: var(--muted); cursor: help; font-size: 11px; }
+
+/* 다음 적립 미리보기 카드 */
+.nextbuy { border-color: var(--accent-weak); }
+.nextbuy-main { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.nb-sym { font-size: 16px; font-weight: 700; }
+.nb-order { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-top: 4px; }
+.nb-cost { text-align: right; }
+.nb-cost .big { font-size: 20px; font-weight: 800; }
+.pill { font-size: 12.5px; font-weight: 600; padding: 4px 11px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: rgba(43,138,62,0.18); color: #5bc77a; }
+.pill.block { background: rgba(240,68,82,0.16); color: #ff7676; }
+
+/* 상단 지수 바 (토스 메인풍) */
+.marketbar { display: flex; gap: 10px; flex-wrap: wrap; padding: 14px 16px; }
+.marketbar .idx {
+  flex: 1 1 150px; min-width: 140px; text-align: left;
+  background: #15151a; border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 14px; cursor: pointer; color: var(--txt);
+  display: flex; flex-direction: column; gap: 2px;
+}
+.marketbar .idx:hover { border-color: var(--accent); filter: none; }
+.idx-head { display: flex; align-items: baseline; gap: 6px; }
+.idx-label { font-size: 13px; font-weight: 700; }
+.idx-proxy { font-size: 10.5px; }
+.idx-price { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+.idx-chg { font-size: 12.5px; font-weight: 600; }
+.spark { margin-top: 4px; }
+
+/* 호가창 사다리 */
+.ob { display: flex; flex-direction: column; font-size: 13px; }
+.ob-row { position: relative; display: flex; align-items: center; height: 30px; padding: 0 10px; }
+.ob-row .ob-vol-bar { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; opacity: 0.18; }
+.ob-row.ask { justify-content: flex-end; }
+.ob-row.ask .ob-vol-bar { right: 0; background: var(--up); }
+.ob-row.bid .ob-vol-bar { left: 0; background: var(--down); }
+.ob-row .ob-price { position: relative; font-weight: 700; min-width: 80px; text-align: right; }
+.ob-row.ask .ob-price { color: var(--up); }
+.ob-row.bid .ob-price { color: var(--down); }
+.ob-row .ob-vol { position: relative; min-width: 80px; text-align: right; color: var(--muted); margin-left: auto; }
+.ob-row.ask .ob-vol { order: -1; margin-left: 0; margin-right: auto; }
+.ob-mid { text-align: center; padding: 6px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+/* 선택 종목 헤더 */
+.stock-head { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.sh-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.sh-price { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; }
+.sh-price .won { font-size: 15px; font-weight: 600; color: var(--muted); margin-left: 2px; }
+.sh-chg { font-size: 15px; font-weight: 700; }
+.sh-meta { display: flex; gap: 16px; margin-left: auto; font-size: 13px; }
+
+/* ---------- 모바일 ---------- */
+@media (max-width: 759px) {
+  .app { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+  /* 상단 로고바: 모바일은 컴팩트하게 유지 (노치 아래로) */
+  .topbar { padding: calc(10px + env(safe-area-inset-top)) 16px 10px; gap: 10px; }
+  .topbar h1 { font-size: 16px; }
+  .brand-name { font-size: 17px; }
+  .top-tabs { display: none; }
+
+  /* 하단 탭바: 탭이 하나뿐이라 모바일에서도 숨김 (탭 늘리면 되살리기) */
+  .bottom-nav { display: none; }
+
+  main, main.single { padding: 12px; gap: 12px; max-width: none; }
+  .card { padding: 15px; border-radius: 16px; }
+  .card h2 { font-size: 14px; margin-bottom: 12px; }
+  .card-head { flex-wrap: wrap; gap: 8px; }
+  .card-head .seg button { padding: 6px 11px; }
+  th, td { padding: 11px 8px; font-size: 13.5px; }
+  .big { font-size: 18px; }
+  .row { gap: 12px; }
+  .stat { min-width: 0; flex: 1 1 42%; }
+  input:not([type='checkbox']) { width: 100%; flex: 1 1 100%; }
+  /* 터치 타깃 확보 */
+  button { min-height: 42px; padding: 10px 14px; }
+  .seg button, .tab { min-height: 0; }
+  .seg button { padding: 7px 16px; }
+
+  /* 히어로 */
+  .hero-sub { gap: 14px 20px; }
+  .hero-sub .stat { min-width: 0; flex: 1 1 40%; }
+
+  /* ③ 전략 상태: LED와 버튼을 세로로 쌓고 버튼은 꽉 채움 */
+  .strat-row { flex-direction: column; align-items: stretch; }
+  .strat-btns { width: 100%; }
+  .strat-btns > button { flex: 1 1 28%; }
+  .sched-field.sched-row { width: 100%; justify-content: space-between; }
+  .strat-stats { gap: 14px 18px; }
+  .strat-stats .stat { flex: 1 1 40%; }
+
+  /* 다음 적립 미리보기: 금액을 아래로, 좌측 정렬 */
+  .nextbuy-main { flex-direction: column; align-items: stretch; gap: 10px; }
+  .nb-cost { text-align: left; }
+  .nb-order { font-size: 18px; }
+
+  /* 세부설정 입력칸: 컨테이너 폭에 맞게 */
+  .num-in { width: 100% !important; }
+
+  /* 단계 헤더 여백 축소 */
+  .step-head { margin-top: 4px; }
+  .step-title { font-size: 15px; }
+
+  /* 브로커 토글: 반반 채움 */
+  .broker-bar .broker-btn { flex: 1 1 0; }
+
+  /* 카드 제목 옆 부제(· 설명)가 좁을 때 줄바꿈 허용 */
+  .card h2 { line-height: 1.35; }
+}
+
+@media (max-width: 420px) {
+  .stat { flex-basis: 100%; }
+  /* 히어로/전략 통계도 한 줄에 하나씩 (긴 계좌번호 오버플로 방지) */
+  .hero-sub .stat, .strat-stats .stat { flex-basis: 100%; }
+  /* 헤더 탭은 한 줄 균등 분배 */
+  header .tab { flex: 1 1 0; text-align: center; }
+  /* 여백·표 더 촘촘히 */
+  main, main.single { padding: 10px; }
+  .card { padding: 14px; }
+  th, td { padding: 10px 6px; font-size: 13px; }
+  .hero-amount { font-size: clamp(24px, 9vw, 30px); }
+  /* 전략 컨트롤 버튼: 초소형에선 2개씩 */
+  .strat-btns > button { flex: 1 1 44%; }
+}
+
+.log-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+.log-pager button:disabled { opacity: 0.4; cursor: default; }

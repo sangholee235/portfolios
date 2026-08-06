@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/etf-bot/(.*)",  "destination": "/etf-bot/index.html"  },
+    { "source": "/etf-bot",       "destination": "/etf-bot/index.html"  },
     { "source": "/gomin/(.*)",    "destination": "/gomin/index.html"    },
     { "source": "/gomin",         "destination": "/gomin/index.html"    },
     { "source": "/techmate/(.*)", "destination": "/techmate/index.html" },

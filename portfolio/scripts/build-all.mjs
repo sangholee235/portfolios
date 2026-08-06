@@ -16,6 +16,7 @@ const ROOT = path.resolve(__dirname, '../../')         // fronts/
 const PORTFOLIO_PUBLIC = path.resolve(__dirname, '../public')
 
 const subProjects = [
+  { name: 'etf-demo', dir: path.join(ROOT, 'etf-demo'), dest: 'etf-bot',  env: {} },
   { name: 'gomin',    dir: path.join(ROOT, 'gomin'),    dest: 'gomin',    env: { VITE_API_BASE_URL: '' } },
   { name: 'techmate', dir: path.join(ROOT, 'frontend'), dest: 'techmate', env: { VITE_API_BASE_URL: '' } },
   { name: 'cholog',   dir: path.join(ROOT, 'cholog'),   dest: 'cholog',   env: { VITE_API_BASE_URL: 'https://www.cholog.com' } },
@@ -26,9 +27,22 @@ function run(cmd, cwd, extraEnv = {}) {
   execSync(cmd, { cwd, stdio: 'inherit', env: { ...process.env, ...extraEnv } })
 }
 
+// fs.cpSync(recursive)가 이 환경(Windows + OneDrive 동기화 경로)에서
+// 조용히 프로세스를 죽이는 문제가 있어(에러도 안 던지고 그냥 죽음), 직접
+// 재귀 복사로 대체 — readdirSync/copyFileSync만 쓰면 문제없이 동작함.
+function copyDirManual(src, dest) {
+  fs.mkdirSync(dest, { recursive: true })
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name)
+    const d = path.join(dest, entry.name)
+    if (entry.isDirectory()) copyDirManual(s, d)
+    else fs.copyFileSync(s, d)
+  }
+}
+
 function copyDir(src, dest) {
   if (fs.existsSync(dest)) fs.rmSync(dest, { recursive: true })
-  fs.cpSync(src, dest, { recursive: true })
+  copyDirManual(src, dest)
 }
 
 // 1. 서브 프로젝트 빌드 & 복사

@@ -1,0 +1,6 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+:root { color-scheme: dark; }
+
+html, body, #root { height: 100%; }
+body { margin: 0; }

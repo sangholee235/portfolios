@@ -1,7 +1,9 @@
 {
-  "buildCommand": "npm install --prefix gomin && npm install --prefix frontend && npm install --prefix cholog && npm install --prefix portfolio && node portfolio/scripts/build-all.mjs",
+  "buildCommand": "npm install --prefix etf-demo && npm install --prefix gomin && npm install --prefix frontend && npm install --prefix cholog && npm install --prefix portfolio && node portfolio/scripts/build-all.mjs",
   "outputDirectory": "portfolio/dist",
   "rewrites": [
+    { "source": "/etf-bot/(.*)",  "destination": "/etf-bot/index.html"  },
+    { "source": "/etf-bot",       "destination": "/etf-bot/index.html"  },
     { "source": "/gomin/(.*)",    "destination": "/gomin/index.html"    },
     { "source": "/gomin",         "destination": "/gomin/index.html"    },
     { "source": "/techmate/(.*)", "destination": "/techmate/index.html" },

@@ -107,8 +107,9 @@ export const projects = [
     troubleshooting: [
       // TODO: STAR 형식 사례 추가 예정 (SKIP 로그 오표시, RuntimeError 미처리, CI skip으로 배포 안 됨 등)
     ],
-    // TODO: 실계좌 노출 없는 더미데이터 데모 빌드 준비 중 — 완성 전까지 null
-    demoUrl: null,
+    // 실계좌 대신 더미데이터로 돌아가는 별도 빌드(etf-demo/) — 실제 대시보드 UI 그대로,
+    // 백엔드 호출만 mock으로 교체(다른 프로젝트들의 MSW와 같은 역할).
+    demoUrl: '/etf-bot/',
     repoUrl: null,
     color: '#F5A623',
     colorLight: '#F5A62322',
