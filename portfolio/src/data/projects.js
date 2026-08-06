@@ -70,7 +70,7 @@ export const projects = [
     tech: ['React', 'TypeScript', 'Redux', 'Recharts', 'MSW', 'Framer Motion'],
     features: [
       'SDK 한 줄로 로그 수집',
-      'AI 로그 분석 (Claude)',
+      'AI 로그 분석',
       '시각화 대시보드 & 리포트',
       'Jira 이슈 자동 생성',
       'Mattermost 웹훅 알림',
