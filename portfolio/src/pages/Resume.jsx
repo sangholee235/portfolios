@@ -11,7 +11,7 @@ export default function Resume() {
   return (
     <section className="min-h-screen px-6 py-20">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-black gradient-text mb-2">이력서</h1>
+        <h1 className="text-3xl font-black text-white mb-2">이상호</h1>
         <p className="text-gray-500 text-sm mb-16">MES 개발자 · 2026년 2월부터 재직 중</p>
 
         <div className="space-y-16">
@@ -20,17 +20,17 @@ export default function Resume() {
           </ResumeSection>
 
           <ResumeSection title="기술 스택">
-            <div className="space-y-8">
+            <div className="space-y-5">
               {skillGroups.map((group) => (
-                <div key={group.title}>
-                  <p className="text-xs font-medium text-gray-500 mb-3">{group.title}</p>
-                  <div className="flex flex-wrap gap-3">
+                <div key={group.title} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                  <p className="text-xs text-gray-500 sm:w-28 sm:flex-shrink-0">{group.title}</p>
+                  <div className="flex flex-wrap gap-2">
                     {group.items.map(({ name, icon: Icon, color }) => (
                       <div
                         key={name}
-                        className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] text-sm text-gray-300"
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-white/10 bg-white/[0.03] text-xs text-gray-300"
                       >
-                        <Icon size={16} style={{ color }} />
+                        <Icon size={13} style={{ color }} />
                         {name}
                       </div>
                     ))}

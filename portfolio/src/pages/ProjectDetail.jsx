@@ -66,7 +66,21 @@ export default function ProjectDetail({ id }) {
             )}
           </DetailSection>
 
-          {/* 4. 기술 스택 */}
+          {/* 4. 설계 고민 (있는 프로젝트만) */}
+          {project.considerations?.length > 0 && (
+            <DetailSection title="설계 고민">
+              <div className="space-y-8">
+                {project.considerations.map((c, i) => (
+                  <div key={i}>
+                    <p className="text-[15px] font-semibold text-white mb-1.5">{c.title}</p>
+                    <p className="text-sm text-gray-400 leading-relaxed">{c.body}</p>
+                  </div>
+                ))}
+              </div>
+            </DetailSection>
+          )}
+
+          {/* 5. 기술 스택 */}
           <DetailSection title="기술 스택">
             <div className="flex flex-wrap gap-2 mb-5">
               {project.tech.map((t) => (
@@ -93,7 +107,7 @@ export default function ProjectDetail({ id }) {
             )}
           </DetailSection>
 
-          {/* 5. 데모 (부가 버튼 — demoUrl 없으면 아예 표시 안 함) */}
+          {/* 6. 데모 (부가 버튼 — demoUrl 없으면 아예 표시 안 함) */}
           {project.demoUrl && (
             <a
               href={project.demoUrl}
