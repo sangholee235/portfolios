@@ -21,18 +21,46 @@ export default function ProjectDetail({ id }) {
         <BackLink />
 
         {/* 헤더 */}
-        <div className="flex items-center gap-4 mt-8 mb-2">
-          <div
-            className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${project.gradientBg} border ${project.borderColor}`}
-          >
-            {project.icon}
+        <div className="flex items-start justify-between gap-4 mt-8 mb-2 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div
+              className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl bg-gradient-to-br ${project.gradientBg} border ${project.borderColor}`}
+            >
+              {project.icon}
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white">{project.name}</h1>
+              <p className="text-sm font-medium mt-0.5" style={{ color: project.color }}>
+                {project.tagline}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-black text-white">{project.name}</h1>
-            <p className="text-sm font-medium mt-0.5" style={{ color: project.color }}>
-              {project.tagline}
-            </p>
-          </div>
+
+          {/* 데모/코드 — 이름 옆에 바로 (없으면 표시 안 함) */}
+          {(project.demoUrl || project.repoUrl) && (
+            <div className="flex items-center gap-2">
+              {project.demoUrl && (
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r ${project.gradient} text-white`}
+                >
+                  데모 보기 →
+                </a>
+              )}
+              {project.repoUrl && (
+                <a
+                  href={project.repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm border border-white/10 text-gray-300 hover:bg-white/5 transition-colors duration-200"
+                >
+                  코드 보기 →
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-14 mt-14">
@@ -106,28 +134,6 @@ export default function ProjectDetail({ id }) {
               <Placeholder />
             )}
           </DetailSection>
-
-          {/* 6. 데모 (부가 버튼 — demoUrl 없으면 아예 표시 안 함) */}
-          {project.demoUrl && (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r ${project.gradient} text-white`}
-            >
-              데모 보기 →
-            </a>
-          )}
-          {project.repoUrl && (
-            <a
-              href={project.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 ml-3 px-6 py-3 rounded-xl font-semibold text-sm border border-white/10 text-gray-300 hover:bg-white/5 transition-colors duration-200"
-            >
-              코드 보기 →
-            </a>
-          )}
         </div>
       </div>
     </section>
