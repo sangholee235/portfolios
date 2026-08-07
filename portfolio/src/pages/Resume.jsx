@@ -12,11 +12,11 @@ export default function Resume() {
     <section className="min-h-screen px-6 py-20">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-black text-white mb-2">이상호</h1>
-        <p className="text-gray-500 text-sm mb-16">MES 개발자 · 2026년 2월부터 재직 중</p>
+        <p className="text-gray-500 text-sm mb-16">1999.06.12 (만 27세)</p>
 
         <div className="space-y-16">
           <ResumeSection title="소개">
-            <Placeholder />
+            <p className="text-sm text-gray-600">준비 중</p>
           </ResumeSection>
 
           <ResumeSection title="기술 스택">
@@ -64,14 +64,6 @@ function ResumeSection({ title, children }) {
     <div>
       <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">{title}</p>
       {children}
-    </div>
-  )
-}
-
-function Placeholder() {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 text-sm text-gray-600">
-      준비 중
     </div>
   )
 }
