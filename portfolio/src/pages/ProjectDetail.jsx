@@ -78,6 +78,20 @@ export default function ProjectDetail({ id }) {
             )}
           </DetailSection>
 
+          {/* 2.5. 실측 지표 (있는 프로젝트만) */}
+          {project.metrics?.length > 0 && (
+            <DetailSection title="실측 지표">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-6">
+                {project.metrics.map((m, i) => (
+                  <div key={i}>
+                    <p className="text-2xl font-black text-white">{m.value}</p>
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed">{m.label}</p>
+                  </div>
+                ))}
+              </div>
+            </DetailSection>
+          )}
+
           {/* 3. 트러블슈팅 */}
           <DetailSection title="트러블슈팅">
             {project.troubleshooting.length > 0 ? (
