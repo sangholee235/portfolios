@@ -1,6 +1,6 @@
 # Fronts — Multi-App Frontend Monorepo
 
-React 기반 프론트엔드 프로젝트 3종을 하나의 레포지토리에서 관리하고, 포트폴리오 사이트와 함께 Vercel 단일 배포로 운영합니다.
+React 기반 프론트엔드 프로젝트 4종을 하나의 레포지토리에서 관리하고, 포트폴리오 사이트와 함께 Vercel 단일 배포로 운영합니다.
 
 ---
 
@@ -8,7 +8,8 @@ React 기반 프론트엔드 프로젝트 3종을 하나의 레포지토리에�
 
 | 디렉터리 | 앱 이름 | 설명 |
 |---|---|---|
-| `portfolio/` | Portfolio | 세 프로젝트를 소개하는 메인 포트폴리오 페이지 |
+| `portfolio/` | Portfolio | 네 프로젝트를 소개하는 메인 포트폴리오 페이지 |
+| `etf-demo/` | ETF 자동 적립 봇 (데모) | 실계좌 대신 더미데이터로 돌아가는 대시보드 UI 데모 |
 | `gomin/` | 고민 한 접시 | 익명 고민 공유 소셜 플랫폼 |
 | `frontend/` | TechMate | 개발자를 위한 IT 뉴스 큐레이션 서비스 |
 | `cholog/` | CHO:LOG | 개발 초보자를 위한 로그 수집·분석 서비스 |
@@ -16,6 +17,19 @@ React 기반 프론트엔드 프로젝트 3종을 하나의 레포지토리에�
 ---
 
 ## 앱 소개
+
+### 📈 ETF 자동 적립 봇 (`/etf-bot`)
+토스증권·키움증권 Open API 기반으로 여러 ETF를 목표 비중대로 그리디 리밸런싱하며 적립하는 매수전용 봇.  
+실계좌는 AWS Lightsail에 상시 배포해 운영 중이며, 여기 배포된 건 백엔드 호출을 mock으로 대체한 데모 빌드입니다.
+
+**주요 기능**
+- 목표비중 그리디 리밸런싱 적립
+- 토스·키움 브로커 추상화
+- 실시간 체결통보 (WebSocket → SSE)
+- Pull 기반 무인 CI/CD
+- DRY_RUN · 하루한도 · 킬스위치 등 다층 안전장치
+
+**기술 스택:** Python · FastAPI · React · TypeScript · Docker · GitHub Actions · AWS Lightsail
 
 ### 🍣 고민 한 접시 (`/gomin`)
 고민을 초밥처럼 올려두면 누군가 답해주는 익명 고민 공유 플랫폼.  
@@ -67,6 +81,9 @@ SDK 한 줄 삽입으로 로그를 수집하고, AI 분석부터 협업 알림�
 각 앱을 독립적으로 실행합니다.
 
 ```bash
+# ETF 자동 적립 봇 (데모)
+cd etf-demo && npm install && npm run dev    # 포트 미지정 — Vite 기본값(5173, 사용 중이면 자동 +1)
+
 # 고민 한 접시
 cd gomin && npm install && npm run dev       # http://localhost:5173
 
@@ -91,6 +108,7 @@ Vercel에서 `portfolio/` 를 출력 디렉터리로 사용하여 단일 배포�
 vercel.json 배포 경로
 
 /           → portfolio (메인)
+/etf-bot/*  → ETF 자동 적립 봇 (데모)
 /gomin/*    → 고민 한 접시
 /techmate/* → TechMate
 /cholog/*   → CHO:LOG
@@ -98,6 +116,7 @@ vercel.json 배포 경로
 
 **Vercel 빌드 커맨드**
 ```bash
+npm install --prefix etf-demo && \
 npm install --prefix gomin && \
 npm install --prefix frontend && \
 npm install --prefix cholog && \
@@ -117,6 +136,8 @@ fronts/
 │   │   └── data/       # projects.js (각 앱 메타 정보)
 │   └── scripts/
 │       └── build-all.mjs
+├── etf-demo/            # ETF 자동 적립 봇 데모 (실계좌 대신 mock 데이터)
+│   └── src/
 ├── gomin/              # 고민 한 접시
 │   └── src/
 ├── frontend/           # TechMate
