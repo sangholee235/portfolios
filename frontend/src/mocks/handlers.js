@@ -8,21 +8,11 @@ const BASE = "/api/v1";
 
 const CATEGORIES = ["AI", "Frontend", "Backend", "DevOps", "Mobile", "Security", "Database", "Cloud"];
 
-// picsum.photos의 완전 무작위 사진(풍경·인물 등)이 기사 주제와 안 맞아 보이는 문제가 있어,
-// 카테고리별로 관련 키워드를 넣어 최소한 주제가 맞는 사진이 나오도록 함. lock=시드로 같은
-// 기사엔 항상 같은 사진이 뜨게 고정.
-const CATEGORY_IMAGE_KEYWORDS = {
-  AI: "artificialintelligence,robot",
-  Frontend: "webdesign,uicode",
-  Backend: "server,datacenter",
-  DevOps: "cloudcomputing,devops",
-  Mobile: "smartphone,mobileapp",
-  Security: "cybersecurity,padlock",
-  Database: "database,server",
-  Cloud: "cloudcomputing,network",
-};
-const imageUrlFor = (category, seed) =>
-  `https://loremflickr.com/400/250/${CATEGORY_IMAGE_KEYWORDS[category] || "technology"}?lock=${seed}`;
+// LoremFlickr(무작위 Flickr 업로드)는 주제는 맞지만 화질 편차가 커서, 화질이 안정적인
+// picsum.photos(Unsplash 출신 큐레이션 사진 풀)로 되돌림 — 주제 연관성보다 화질 우선.
+// 표시 크기(400x250)보다 2배 큰 해상도로 받아와 화면에서 더 선명하게 보이도록 함.
+const imageUrlFor = (_category, seed) =>
+  `https://picsum.photos/seed/${seed}/800/500`;
 
 const MOCK_ARTICLES = Array.from({ length: 40 }, (_, i) => ({
   articleId: i + 1,
