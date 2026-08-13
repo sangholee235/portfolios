@@ -8,6 +8,22 @@ const BASE = "/api/v1";
 
 const CATEGORIES = ["AI", "Frontend", "Backend", "DevOps", "Mobile", "Security", "Database", "Cloud"];
 
+// picsum.photos의 완전 무작위 사진(풍경·인물 등)이 기사 주제와 안 맞아 보이는 문제가 있어,
+// 카테고리별로 관련 키워드를 넣어 최소한 주제가 맞는 사진이 나오도록 함. lock=시드로 같은
+// 기사엔 항상 같은 사진이 뜨게 고정.
+const CATEGORY_IMAGE_KEYWORDS = {
+  AI: "artificialintelligence,robot",
+  Frontend: "webdesign,uicode",
+  Backend: "server,datacenter",
+  DevOps: "cloudcomputing,devops",
+  Mobile: "smartphone,mobileapp",
+  Security: "cybersecurity,padlock",
+  Database: "database,server",
+  Cloud: "cloudcomputing,network",
+};
+const imageUrlFor = (category, seed) =>
+  `https://loremflickr.com/400/250/${CATEGORY_IMAGE_KEYWORDS[category] || "technology"}?lock=${seed}`;
+
 const MOCK_ARTICLES = Array.from({ length: 40 }, (_, i) => ({
   articleId: i + 1,
   title: [
@@ -39,7 +55,7 @@ const MOCK_ARTICLES = Array.from({ length: 40 }, (_, i) => ({
     "프로덕션 환경에서 발생하는 성능 이슈를 해결하기 위한 실용적인 전략을 소개합니다.",
     "타입 안전성을 극대화하기 위한 고급 타입 기법과 실무 활용 패턴을 다룹니다.",
   ][i % 5],
-  thumbnailImageUrl: `https://picsum.photos/seed/${i + 1}/400/250`,
+  thumbnailImageUrl: imageUrlFor(CATEGORIES[i % CATEGORIES.length], i + 1),
   datetime: new Date(Date.now() - i * 86400000 * 2).toISOString(),
   category: CATEGORIES[i % CATEGORIES.length],
   journal: ["Tech Blog", "Medium", "Dev.to", "Velog", "Tistory"][i % 5],
